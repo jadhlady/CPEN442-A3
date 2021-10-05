@@ -1,0 +1,307 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.1">
+  <object class="tk.Toplevel" id="toplevel">
+    <property name="height">600</property>
+    <property name="resizable">none</property>
+    <property name="title" translatable="yes">CPEN442 VPN</property>
+    <property name="width">800</property>
+    <child>
+      <object class="ttk.Frame" id="infoFrame">
+        <property name="height">0</property>
+        <property name="width">300</property>
+        <layout manager="grid">
+          <property name="column">0</property>
+          <property name="propagate">True</property>
+          <property name="row">0</property>
+          <property name="sticky">nw</property>
+        </layout>
+        <child>
+          <object class="ttk.Labelframe" id="modeFrame">
+            <property name="height">200</property>
+            <property name="text" translatable="yes">Mode</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="ipadx">5</property>
+              <property name="ipady">2</property>
+              <property name="padx">10</property>
+              <property name="pady">10</property>
+            </layout>
+            <child>
+              <object class="ttk.Radiobutton" id="clientRadioButton">
+                <property name="command" type="command" cbtype="simple">ClientModeSelected</property>
+                <property name="text" translatable="yes">Client</property>
+                <property name="value">0</property>
+                <property name="variable">int:mode</property>
+                <property name="width">29</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="pady">5</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                  <property name="sticky">w</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Radiobutton" id="serverRadioButton">
+                <property name="command" type="command" cbtype="simple">ServerModeSelected</property>
+                <property name="text" translatable="yes">Server</property>
+                <property name="value">1</property>
+                <property name="variable">int:mode</property>
+                <property name="width">29</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="propagate">True</property>
+                  <property name="row">1</property>
+                  <property name="sticky">w</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Labelframe" id="configFrame">
+            <property name="height">200</property>
+            <property name="text" translatable="yes">Configuration</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="ipadx">5</property>
+              <property name="ipady">5</property>
+              <property name="padx">10</property>
+              <property name="pady">10</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="ipLabel">
+                <property name="text" translatable="yes">IP Address / Host Name:</property>
+                <property name="width">32</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="padx">4</property>
+                  <property name="pady">4</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                  <property name="sticky">w</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Entry" id="ipEntry">
+                <property name="text" translatable="yes">localhost</property>
+                <property name="textvariable">string:hostName</property>
+                <property name="width">31</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="padx">5</property>
+                  <property name="pady">1</property>
+                  <property name="propagate">True</property>
+                  <property name="row">1</property>
+                  <property name="sticky">w</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="portLabel">
+                <property name="text" translatable="yes">Port:</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="padx">4</property>
+                  <property name="pady">4</property>
+                  <property name="propagate">True</property>
+                  <property name="row">2</property>
+                  <property name="sticky">w</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Entry" id="portEntry">
+                <property name="text" translatable="yes">42168</property>
+                <property name="textvariable">string:port</property>
+                <property name="width">31</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="padx">5</property>
+                  <property name="pady">1</property>
+                  <property name="propagate">True</property>
+                  <property name="row">3</property>
+                  <property name="sticky">w</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Label" id="secretLabel">
+                <property name="text" translatable="yes">Shared Secret:</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="padx">4</property>
+                  <property name="pady">4</property>
+                  <property name="propagate">True</property>
+                  <property name="row">4</property>
+                  <property name="sticky">w</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Entry" id="secretEntry">
+                <property name="text" translatable="yes">testKey</property>
+                <property name="textvariable">string:sharedSecret</property>
+                <property name="width">31</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="padx">5</property>
+                  <property name="pady">1</property>
+                  <property name="propagate">True</property>
+                  <property name="row">5</property>
+                  <property name="sticky">w</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Labelframe" id="actionFrame">
+            <property name="height">100</property>
+            <property name="text" translatable="yes">Action</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="padx">10</property>
+              <property name="pady">10</property>
+            </layout>
+            <child>
+              <object class="ttk.Button" id="connectButton">
+                <property name="command" type="command" cbtype="simple">CreateConnection</property>
+                <property name="text" translatable="yes">Create Connection</property>
+                <property name="width">31</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="padx">5</property>
+                  <property name="pady">5</property>
+                  <property name="propagate">True</property>
+                  <property name="row">0</property>
+                  <property name="sticky">w</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Button" id="secureButton">
+                <property name="command" type="command" cbtype="simple">SecureConnection</property>
+                <property name="state">disabled</property>
+                <property name="text" translatable="yes">Secure Connection</property>
+                <property name="width">31</property>
+                <layout manager="grid">
+                  <property name="column">0</property>
+                  <property name="padx">5</property>
+                  <property name="pady">5</property>
+                  <property name="propagate">True</property>
+                  <property name="row">1</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Labelframe" id="chatFrane">
+        <property name="height">0</property>
+        <property name="text" translatable="yes">Messaging:</property>
+        <property name="width">0</property>
+        <layout manager="grid">
+          <property name="column">1</property>
+          <property name="padx">10</property>
+          <property name="propagate">True</property>
+          <property name="row">0</property>
+          <property name="sticky">n</property>
+        </layout>
+        <child>
+          <object class="tk.Text" id="messagesText">
+            <property name="autoseparators">false</property>
+            <property name="height">30</property>
+            <property name="relief">flat</property>
+            <property name="setgrid">false</property>
+            <property name="state">disabled</property>
+            <property name="width">50</property>
+            <layout manager="pack">
+              <property name="propagate">True</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="sendButton">
+            <property name="command" type="command" cbtype="simple">SendMessage</property>
+            <property name="state">disabled</property>
+            <property name="text" translatable="yes">Send Message</property>
+            <layout manager="pack">
+              <property name="anchor">ne</property>
+              <property name="padx">5</property>
+              <property name="pady">5</property>
+              <property name="propagate">True</property>
+              <property name="side">right</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Entry" id="messageEntry">
+            <property name="state">normal</property>
+            <property name="textvariable">string:textMessage</property>
+            <property name="validate">none</property>
+            <layout manager="pack">
+              <property name="anchor">nw</property>
+              <property name="expand">true</property>
+              <property name="fill">x</property>
+              <property name="padx">5</property>
+              <property name="pady">5</property>
+              <property name="propagate">False</property>
+              <property name="side">left</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Labelframe" id="logFrame">
+        <property name="height">0</property>
+        <property name="text" translatable="yes">Logs:</property>
+        <property name="width">0</property>
+        <layout manager="grid">
+          <property name="column">2</property>
+          <property name="propagate">True</property>
+          <property name="row">0</property>
+          <property name="sticky">ne</property>
+        </layout>
+        <child>
+          <object class="tk.Text" id="logsText">
+            <property name="height">30</property>
+            <property name="insertunfocussed">none</property>
+            <property name="relief">flat</property>
+            <property name="state">disabled</property>
+            <property name="takefocus">false</property>
+            <property name="width">50</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">5</property>
+              <property name="pady">5</property>
+              <property name="propagate">True</property>
+              <property name="row">0</property>
+              <property name="sticky">ne</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="clearButton">
+            <property name="command" type="command" cbtype="simple">ClearLogs</property>
+            <property name="text" translatable="yes">Clear Logs</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">4</property>
+              <property name="pady">4</property>
+              <property name="propagate">True</property>
+              <property name="row">1</property>
+              <property name="sticky">e</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
