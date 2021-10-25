@@ -16,7 +16,8 @@ You must provide your own implementation of mutual authentication and key establ
 You may choose whichever mutual authentication protocol and whichever key establishment protocol (or whichever combined protocol), stream or block ciphers and modes of operation you wish. However, you must be able to justify why you chose it and why you believe it is suitable (i.e., sufficiently secure) for implementing a VPN. To keep things simple, appropriate cryptographic algorithms include AES, DES, MD5, SHA (various versions), RSA, D-H, HMAC-MD5. When using these, ignore all padding rules (i.e., when padding is required, pad with zeros) and use the smallest moduli that will work.
 
 Apart from your protocol design, your implementation must also be secure. It must follow the principles of designing secure systems as taught in class. Insecure implementations (e.g., not sanitizing inputs) will result in reduced marks.
-Bonus Problem (5 Points):
+
+## Bonus Problem (5 Points):
 
 Add a separate section to your report and explain: What principle(s) of designing secure systems did you follow when implementing your VPN? For each principle, you should specify what parts of code or protocol design decisions were influenced by it, and how it helped to make your implementation more secure. Generic answers (e.g., “it helped to improve confidentiality”) will not get any points.
 
