@@ -45,7 +45,7 @@ By the time that the TA is ready to type into the “Data to be Sent” window, 
 
 ## Deliverables:
 
-You are expected to write a document and your program. The document should include the following:
+You are expected to write a [document](https://docs.google.com/document/d/1JRlaMrwFDA7UM4aOAmyj8gZ_BYR8wytl88DrWoQAPnk/edit) and your program. The document should include the following:
 
     A brief (no more than one page) but sufficient instructions for installing and executing your program installation (in case you decided not to use the project template).
     A brief description (no more than four pages) of how your VPN works. This description should include:
