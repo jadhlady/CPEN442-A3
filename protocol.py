@@ -1,6 +1,5 @@
 import random
-
-from app import Assignment3VPN
+from tkinter.constants import TRUE
 
 class Protocol:
     # Initializer (Called from app.py)
