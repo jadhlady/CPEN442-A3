@@ -32,6 +32,10 @@ class Protocol:
     # TODO: IMPLMENET THE LOGIC (CALL SetSessionKey ONCE YOU HAVE THE KEY ESTABLISHED)
     # THROW EXCEPTION IF AUTHENTICATION FAILS
     def ProcessReceivedProtocolMessage(self, message):
+         #TODO: decrypt and sanitize message
+        received_public_key = None
+        session_key = pow(received_public_key, self.private_val, self.p)
+        self.SetSessionKey(session_key)
         pass
 
 
