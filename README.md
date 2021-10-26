@@ -17,3 +17,25 @@ In this assignment, you are instructed to implment a Virtual Private Network (VP
 - If you find a bug in this template, please implement a fix and submit a pull request. You might get bonus points depending on how substantial the bug and fix is. Note that changing the program to fit your protocol does not count as finding a bug.
 
 Good luck.
+
+
+## To Do
+- [ ] Mutual Authentication and Key Establishment 
+    - [ ] D-H for key establishment, which will be our session key (Jadon)
+    - [ ] Send Public Keys of Client and Server (Ebi)
+    - [ ] Store each key per session (Shawn)
+- [ ] Confidentiality (Alex)
+    - [ ] AES-256, 512
+        - [ ] Encryption
+        - [ ] Decryption
+- [ ] Integrity (Shade)
+    - []  SHA-256, 512
+        - [ ] Encryption
+        - [ ] Decryption
+- [ ]  A brief (no more than one page) but sufficient instructions for installing and executing your program installation (in case you decided not to use the project template).
+    - [ ]  A brief description (no more than four pages) of how your VPN works. This description should include:
+    - [ ]  A discussion of how the data is actually sent/received, and protected,
+    - [ ]  A discussion of the mutual authentication and key establishment protocols you chose to use, why you chose them, and the computation performed by each side at each step in the protocol(s).
+    - [ ]  A discussion of how you derive encryption and integrity-protection keys from the shared secret value.
+    - [ ]  A short answer to the following question: if you were implementing this VPN as a real-world product for sale, what algorithms, modulus sizes, encryption key size, and integrity key size would you use?
+    - [ ]  In case you did not use the project template: Explanation of what language the software is written in, the size of the program (lines of code; size of the executable), and the modules or major architectural components of your program (along with inputs, outputs, and functionality for each).
