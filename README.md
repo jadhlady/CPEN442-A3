@@ -28,10 +28,10 @@ Good luck.
     - [ ] AES-256, 512
         - [ ] Encryption
         - [ ] Decryption
-- [ ] Integrity (Shade)
-    - []  SHA-256, 512
-        - [ ] Encryption
-        - [ ] Decryption
+- [x] Integrity (Shade)
+    - [x]  SHA-256, 512
+        - [x] Encryption
+        - [x] Decryption
 - [ ]  A brief (no more than one page) but sufficient instructions for installing and executing your program installation (in case you decided not to use the project template).
     - [ ]  A brief description (no more than four pages) of how your VPN works. This description should include:
     - [ ]  A discussion of how the data is actually sent/received, and protected,
