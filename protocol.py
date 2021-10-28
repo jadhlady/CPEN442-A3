@@ -1,11 +1,32 @@
 import random
 from tkinter.constants import TRUE
+import hashlub
+
+# local import from "exception.py"
+import exception
 
 class Protocol:
     # Initializer (Called from app.py)
     # TODO: MODIFY ARGUMENTS AND LOGIC AS YOU SEEM FIT
     def __init__(self):
         pass
+
+    ###############     PRIVATE METHODS     ###############
+
+    def _HashFunction():
+        """ 
+        This cryptogrpahic hash function is implemented using the SHA-256 algorithm.
+        It is used to check the integrity of the messages.
+        """
+
+    def _AuthenticateSender():
+         """ 
+        This function is implemented using the Diffie-Hellman algorithm.
+        It is used to authenticate the sender of the message received.
+        """
+
+    ########################################################
+
         
     # Creating the initial message of your protocol (to be send to the other party to bootstrap the protocol)
     # TODO: IMPLEMENT THE LOGIC (MODIFY THE INPUT ARGUMENTS AS YOU SEEM FIT)
@@ -45,13 +66,44 @@ class Protocol:
     # TODO: IMPLEMENT ENCRYPTION WITH THE SESSION KEY (ALSO INCLUDE ANY NECESSARY INFO IN THE ENCRYPTED MESSAGE FOR INTEGRITY PROTECTION)
     # RETURN AN ERROR MESSAGE IF INTEGRITY VERITIFCATION OR AUTHENTICATION FAILS
     def EncryptAndProtectMessage(self, plain_text):
-        cipher_text = plain_text
-        return cipher_text
+        try:
+            integrity_verified = self._HashFunction()
+            authenticated = self._AuthenticateSender()
+
+            if (not integrity_verified)
+                raise IntegrityVerificationError
+
+            if (not authenticated)
+                raise AuthenticationError
+            
+            cipher_text = plain_text
+            return cipher_text
+            
+        except IntegrityVerificationError:
+            return "ENCRYPTION ERROR: INTEGRITY VERIFICATION FAILED."
+        except AuthenticationError:
+            return "ENCRYPTION ERROR: AUTHENTICATION FAILED."
+        
 
 
     # Decrypting and verifying messages
     # TODO: IMPLEMENT DECRYPTION AND INTEGRITY CHECK WITH THE SESSION KEY
     # RETURN AN ERROR MESSAGE IF INTEGRITY VERITIFCATION OR AUTHENTICATION FAILS
     def DecryptAndVerifyMessage(self, cipher_text):
-        plain_text = cipher_text
-        return plain_text
+        try:
+            integrity_verified = self._HashFunction()
+            authenticated = self._AuthenticateSender()
+
+            if (not integrity_verified)
+                raise IntegrityVerificationError
+
+            if (not authenticated)
+                raise AuthenticationError
+
+            plain_text = cipher_text
+            return plain_text
+
+        except IntegrityVerificationError:
+            return "ENCRYPTION ERROR: INTEGRITY VERIFICATION FAILED."
+        except AuthenticationError:
+            return "ENCRYPTION ERROR: AUTHENTICATION FAILED." 
