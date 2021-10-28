@@ -15,7 +15,7 @@ class Protocol:
 
     def _CalculateHash(self, message):
         msg = str(message)
-        msg_bytes = msg.encode('utf-8')
+        msg_bytes = msg.encode()
         return hashlib.sha256(msg_bytes).hexdigest()
 
 
@@ -24,11 +24,12 @@ class Protocol:
         It is used to check the integrity of the messages. """
 
         # Extract the hash value from string
-        hash_value = hash_message[-64:]
+        hash_value = hash_message[-65:-1]
         orig_len = len(hash_message)
-        message = hash_message[:orig_len - 64]
+        message = hash_message[2:orig_len - 65]
 
-        received_hash = self._CalculateHash(message)
+        received_hash = self._CalculateHash(str(message))
+
         if (received_hash != hash_value):
             return [False, message]
 
@@ -89,7 +90,7 @@ class Protocol:
                 raise AuthenticationError
 
             # TODO: Use the current user's private key to protect the message before sending
-            signed_plaintext = plain_text.encode()
+            signed_plaintext = str(plain_text)
 
             hash_msg = self._CalculateHash(signed_plaintext)
 
@@ -112,7 +113,7 @@ class Protocol:
             
             # TODO: Remove the signature layer here to get the message appended with its hash value
             # before verifying the hash and message
-            hash_msg = cipher_text.encode()
+            hash_msg = str(cipher_text)
 
             integrity_verified, signed_message = self._VerifyIntegrity(hash_msg)
 
