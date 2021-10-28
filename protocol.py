@@ -3,7 +3,7 @@ from tkinter.constants import TRUE
 import hashlib
 
 # local import from "exceptions.py"
-import exceptions
+from exceptions import *
 
 class Protocol:
     # Initializer (Called from app.py)
