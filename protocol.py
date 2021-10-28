@@ -1,6 +1,6 @@
 import random
 from tkinter.constants import TRUE
-import hashlub
+import hashlib
 
 # local import from "exception.py"
 import exception
@@ -78,7 +78,7 @@ class Protocol:
             
             cipher_text = plain_text
             return cipher_text
-            
+
         except IntegrityVerificationError:
             return "ENCRYPTION ERROR: INTEGRITY VERIFICATION FAILED."
         except AuthenticationError:
