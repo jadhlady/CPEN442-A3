@@ -3,7 +3,7 @@ from tkinter.constants import TRUE
 import hashlib
 
 # local import from "exceptions.py"
-import exceptions
+from exceptions import IntegrityVerificationError, AuthenticationError
 
 class Protocol:
     # Initializer (Called from app.py)
@@ -13,16 +13,33 @@ class Protocol:
 
     ###############     PRIVATE METHODS     ###############
 
-    def _VerifyIntegrity(self, cipher_text):
+    def _CalculateHash(self, message):
+        msg = str(message)
+        msg_bytes = msg.encode('utf-8')
+        return hashlib.sha256(msg_bytes).hexdigest()
+
+
+    def _VerifyIntegrity(self, hash_message):
         """ This cryptogrpahic hash function is implemented using the SHA-256 algorithm.
         It is used to check the integrity of the messages. """
-        return True
+
+        # Extract the hash value from string
+        hash_value = hash_message[-64:]
+        orig_len = len(hash_message)
+        message = hash_message[:orig_len - 64]
+
+        received_hash = self._CalculateHash(message)
+        if (received_hash != hash_value):
+            return [False, message]
+
+        return [True, message]
 
 
     def _AuthenticateSender(self):
         """ This function is implemented using the Diffie-Hellman algorithm.
         It is used to authenticate the sender of the message received. """
         return True
+
 
     ########################################################
 
@@ -72,15 +89,14 @@ class Protocol:
                 raise AuthenticationError
 
             # TODO: Use the current user's private key to protect the message before sending
-            signed_plaintext = plain_text
+            signed_plaintext = plain_text.encode()
 
-            splaintext_bytes = signed_plaintext.encode()
-            hash_msg = hashlib.sha256(splaintext_bytes).hexdigest()
+            hash_msg = self._CalculateHash(signed_plaintext)
 
             cipher_text = signed_plaintext + hash_msg  # Append message digest for verification
             return cipher_text
 
-        except AuthenticationError:
+        except AuthenticationError as error:
             return "ENCRYPTION ERROR: AUTHENTICATION FAILED."
         
 
@@ -89,19 +105,26 @@ class Protocol:
     # RETURN AN ERROR MESSAGE IF INTEGRITY VERITIFCATION OR AUTHENTICATION FAILS
     def DecryptAndVerifyMessage(self, cipher_text):
         try:
-            integrity_verified = self._VerifyIntegrity(cipher_text)
             authenticated = self._AuthenticateSender()
+
+            if (not authenticated):
+                raise AuthenticationError
+            
+            # TODO: Remove the signature layer here to get the message appended with its hash value
+            # before verifying the hash and message
+            hash_msg = cipher_text.encode()
+
+            integrity_verified, signed_message = self._VerifyIntegrity(hash_msg)
 
             if (not integrity_verified):
                 raise IntegrityVerificationError
 
-            if (not authenticated):
-                raise AuthenticationError
+            # decrypt the signed message
+            message = str(signed_message)
 
-            plain_text = cipher_text
-            return plain_text
+            return message
 
-        except IntegrityVerificationError:
+        except IntegrityVerificationError as error:
             return "ENCRYPTION ERROR: INTEGRITY VERIFICATION FAILED."
-        except AuthenticationError:
+        except AuthenticationError as error:
             return "ENCRYPTION ERROR: AUTHENTICATION FAILED." 
