@@ -70,10 +70,10 @@ class Protocol:
             integrity_verified = self._HashFunction()
             authenticated = self._AuthenticateSender()
 
-            if (not integrity_verified)
+            if (not integrity_verified):
                 raise IntegrityVerificationError
 
-            if (not authenticated)
+            if (not authenticated):
                 raise AuthenticationError
             
             cipher_text = plain_text
