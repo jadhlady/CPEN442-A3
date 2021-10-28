@@ -2,8 +2,8 @@ import random
 from tkinter.constants import TRUE
 import hashlib
 
-# local import from "exception.py"
-import exception
+# local import from "exceptions.py"
+import exceptions
 
 class Protocol:
     # Initializer (Called from app.py)
@@ -13,17 +13,16 @@ class Protocol:
 
     ###############     PRIVATE METHODS     ###############
 
-    def _HashFunction():
-        """ 
-        This cryptogrpahic hash function is implemented using the SHA-256 algorithm.
-        It is used to check the integrity of the messages.
-        """
+    def _VerifyIntegrity(self, cipher_text):
+        """ This cryptogrpahic hash function is implemented using the SHA-256 algorithm.
+        It is used to check the integrity of the messages. """
+        return True
 
-    def _AuthenticateSender():
-         """ 
-        This function is implemented using the Diffie-Hellman algorithm.
-        It is used to authenticate the sender of the message received.
-        """
+
+    def _AuthenticateSender(self):
+        """ This function is implemented using the Diffie-Hellman algorithm.
+        It is used to authenticate the sender of the message received. """
+        return True
 
     ########################################################
 
@@ -67,37 +66,36 @@ class Protocol:
     # RETURN AN ERROR MESSAGE IF INTEGRITY VERITIFCATION OR AUTHENTICATION FAILS
     def EncryptAndProtectMessage(self, plain_text):
         try:
-            integrity_verified = self._HashFunction()
             authenticated = self._AuthenticateSender()
 
-            if (not integrity_verified)
-                raise IntegrityVerificationError
-
-            if (not authenticated)
+            if (not authenticated):
                 raise AuthenticationError
-            
-            cipher_text = plain_text
+
+            # TODO: Use the current user's private key to protect the message before sending
+            signed_plaintext = plain_text
+
+            splaintext_bytes = signed_plaintext.encode()
+            hash_msg = hashlib.sha256(splaintext_bytes).hexdigest()
+
+            cipher_text = signed_plaintext + hash_msg  # Append message digest for verification
             return cipher_text
 
-        except IntegrityVerificationError:
-            return "ENCRYPTION ERROR: INTEGRITY VERIFICATION FAILED."
         except AuthenticationError:
             return "ENCRYPTION ERROR: AUTHENTICATION FAILED."
         
-
 
     # Decrypting and verifying messages
     # TODO: IMPLEMENT DECRYPTION AND INTEGRITY CHECK WITH THE SESSION KEY
     # RETURN AN ERROR MESSAGE IF INTEGRITY VERITIFCATION OR AUTHENTICATION FAILS
     def DecryptAndVerifyMessage(self, cipher_text):
         try:
-            integrity_verified = self._HashFunction()
+            integrity_verified = self._VerifyIntegrity(cipher_text)
             authenticated = self._AuthenticateSender()
 
-            if (not integrity_verified)
+            if (not integrity_verified):
                 raise IntegrityVerificationError
 
-            if (not authenticated)
+            if (not authenticated):
                 raise AuthenticationError
 
             plain_text = cipher_text
