@@ -1,6 +1,7 @@
 import random
 from tkinter.constants import TRUE
 import hashlib
+import time
 
 # local import from "exceptions.py"
 from exceptions import IntegrityVerificationError, AuthenticationError
@@ -46,6 +47,12 @@ class Protocol:
     ########################################################
 
 
+    # Uses timestamp to generate a unique nonce challenge to prevent replay
+    # attacks.
+    def GetRandomChallenge(self):
+        return time.time()
+
+
     # Creating the initial message of your protocol (to be send to the other party to bootstrap the protocol)
     # TODO: IMPLEMENT THE LOGIC (MODIFY THE INPUT ARGUMENTS AS YOU SEEM FIT)
     def GetProtocolInitiationMessage(self):
@@ -53,7 +60,11 @@ class Protocol:
         self.g = 2
         self.private_val = random.getrandbits(2048) 
         self.public_val = pow(self.g,self.private_val,self.p)
-        return self.public_val
+
+        self.nonce = self.GetRandomChallenge()
+
+        # TODO: These values should be encrypted with the shared secret before sending
+        return self.public_val, self.nonce
 
 
     # Checking if a received message is part of your protocol (called from app.py)
@@ -66,8 +77,16 @@ class Protocol:
     # TODO: IMPLMENET THE LOGIC (CALL SetSessionKey ONCE YOU HAVE THE KEY ESTABLISHED)
     # THROW EXCEPTION IF AUTHENTICATION FAILS
     def ProcessReceivedProtocolMessage(self, message):
-         #TODO: decrypt and sanitize message
+        message = self.DecryptAndVerifyMessage(message)
+
+        # TODO: parse message to obtain public key and nonce
         received_public_key = None
+        nonce = None
+
+        # Verify nonce challenge was solved
+        if nonce != self.nonce:
+            raise AuthenticationError
+        
         session_key = pow(received_public_key, self.private_val, self.p)
         self._SetSessionKey(session_key)
         pass
