@@ -8,7 +8,8 @@ from exceptions import IntegrityVerificationError, AuthenticationError
 class Protocol:
     # Initializer (Called from app.py)
     # TODO: MODIFY ARGUMENTS AND LOGIC AS YOU SEEM FIT
-    def __init__(self):
+    def __init__(self, sharedSecret):
+        self.SetSharedSecret(sharedSecret)
         pass
 
     ###############     PRIVATE METHODS     ###############
@@ -44,7 +45,7 @@ class Protocol:
 
     ########################################################
 
-        
+
     # Creating the initial message of your protocol (to be send to the other party to bootstrap the protocol)
     # TODO: IMPLEMENT THE LOGIC (MODIFY THE INPUT ARGUMENTS AS YOU SEEM FIT)
     def GetProtocolInitiationMessage(self):
@@ -68,15 +69,22 @@ class Protocol:
          #TODO: decrypt and sanitize message
         received_public_key = None
         session_key = pow(received_public_key, self.private_val, self.p)
-        self.SetSessionKey(session_key)
+        self._SetSessionKey(session_key)
         pass
+    
+
+    # Setting the shared secret to encrypt protocol messages
+    def SetSharedSecret(self, sharedSecret):
+        """ This function sets the long-term shared secret for the protocol
+        when it receives an update from the application."""
+        self._sharedSecret = sharedSecret
 
 
     # Setting the key for the current session
-    # TODO: MODIFY AS YOU SEEM FIT
-    def SetSessionKey(self, key):
-        self._key = key
-        pass
+    def _SetSessionKey(self, key):
+        """ This function sets the session key secret (intended to be used for
+        this session only."""
+        self._sessionKey = key
 
 
     # Encrypting messages
