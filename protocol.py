@@ -1,5 +1,5 @@
 import random
-from tkinter.constants import TRUE
+from tkinter.constants import FALSE, TRUE
 import hashlib
 
 # local import from "exceptions.py"
@@ -40,7 +40,11 @@ class Protocol:
     # Checking if a received message is part of your protocol (called from app.py)
     # TODO: IMPLMENET THE LOGICs
     def IsMessagePartOfProtocol(self, message):
-        return False
+        #if(message.find(self.protocolFlag, 0, self.protocolFlagLength) != -1): 
+        if(message.find("Protocol: ", 0, len("Protocol: ")) != -1):
+            return True  # if the message contains a protocol flag
+        else:
+            return False
 
 
     # Processing protocol message
@@ -48,7 +52,8 @@ class Protocol:
     # THROW EXCEPTION IF AUTHENTICATION FAILS
     def ProcessReceivedProtocolMessage(self, message):
          #TODO: decrypt and sanitize message
-        received_public_key = None
+        #received_public_key = message.removeprefix("Protocol: ")
+        received_public_key = message # Add condition to check if passes
         session_key = pow(received_public_key, self.private_val, self.p)
         self.SetSessionKey(session_key)
         pass

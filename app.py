@@ -1,7 +1,7 @@
 # system imports
 import sys
 import socket
-from threading import Thread
+from threading import Condition, Thread
 import pygubu
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -143,6 +143,14 @@ class Assignment3VPN:
                 # Receiving all the data
                 cipher_text = self.conn.recv(4096)
 
+                self.is_protocol = False
+
+                if(cipher_text.find("Protocol: ", 0, len("Protocol: ")) != -1):
+                    cipher_text = cipher_text.removeprefix("Protocol: ")
+                    self.is_protocol = True
+                    
+                cipher_text = int(cipher_text) #Convert the string back into a number for the rest of the function
+
                 # Check if socket is still open
                 if cipher_text == None or len(cipher_text) == 0:
                     self._AppendLog("RECEIVER_THREAD: Received empty message")
@@ -150,7 +158,8 @@ class Assignment3VPN:
 
                 # Checking if the received message is part of your protocol
                 # TODO: MODIFY THE INPUT ARGUMENTS AND LOGIC IF NECESSARY
-                if self.prtcl.IsMessagePartOfProtocol(cipher_text):
+                #if self.prtcl.IsMessagePartOfProtocol(cipher_text):
+                if self.is_protocol:
                     # Disabling the button to prevent repeated clicks
                     self.secureButton["state"] = "disabled"
                     # Processing the protocol message
@@ -170,6 +179,7 @@ class Assignment3VPN:
     def _SendMessage(self, message):
         plain_text = message
         cipher_text = self.prtcl.EncryptAndProtectMessage(plain_text)
+        cipher_text = "Protocol: " + Unicode(cipher_text)
         self.conn.send(cipher_text.encode())
             
 
@@ -180,6 +190,9 @@ class Assignment3VPN:
 
         # TODO: THIS IS WHERE YOU SHOULD IMPLEMENT THE START OF YOUR MUTUAL AUTHENTICATION AND KEY ESTABLISHMENT PROTOCOL, MODIFY AS YOU SEEM FIT
         init_message = self.prtcl.GetProtocolInitiationMessage()
+        #protocolFlag = "Protocol: "
+        #init_message_w_flag = protocolFlag + str(init_message) #Change to number to a string, and prepend the protocol flag
+        #self._SendMessage(init_message_w_flag)
         self._SendMessage(init_message)
 
 
