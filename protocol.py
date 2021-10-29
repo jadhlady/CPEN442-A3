@@ -2,6 +2,7 @@ import random
 from tkinter.constants import TRUE
 import hashlib
 import time
+from enum import Enum
 
 # local import from "exceptions.py"
 from exceptions import IntegrityVerificationError, AuthenticationError
@@ -12,6 +13,12 @@ class Protocol:
     def __init__(self, sharedSecret):
         self.SetSharedSecret(sharedSecret)
         pass
+
+
+    class ClientOrServerIdentifier(Enum):
+        CLIENT = "CLIENT"
+        SERVER = "SERVER"
+
 
     ###############     PRIVATE METHODS     ###############
 
@@ -53,6 +60,12 @@ class Protocol:
         return time.time()
 
 
+    # Sets the client or server identifier for this protocol user to identify
+    # if messages are being sent back to ourselves.
+    def SetClientOrServerIdentifier(self, identifier):
+        self._identifier = identifier
+
+
     # Creating the initial message of your protocol (to be send to the other party to bootstrap the protocol)
     # TODO: IMPLEMENT THE LOGIC (MODIFY THE INPUT ARGUMENTS AS YOU SEEM FIT)
     def GetProtocolInitiationMessage(self):
@@ -79,12 +92,17 @@ class Protocol:
     def ProcessReceivedProtocolMessage(self, message):
         message = self.DecryptAndVerifyMessage(message)
 
-        # TODO: parse message to obtain public key and nonce
+        # TODO: parse message to obtain public key, nonce, and client/server identifier
         received_public_key = None
         nonce = None
+        identifier = None
 
         # Verify nonce challenge was solved
         if nonce != self.nonce:
+            raise AuthenticationError
+
+        # Verify we did not receive our own message
+        if (identifier == self._identifier) or (identifier not in Protocol.ClientOrServerIdentifier.__members__):
             raise AuthenticationError
         
         session_key = pow(received_public_key, self.private_val, self.p)

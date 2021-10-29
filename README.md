@@ -23,7 +23,7 @@ Good luck.
 - [ ] Mutual Authentication and Key Establishment 
     - [ ] D-H for key establishment, which will be our session key (Jadon)
     - [ ] Send Public Keys of Client and Server (Ebi)
-    - [ ] Store each key per session (Shawn)
+    - [ ] Add nonce challenge and user identity, store each key per session (Shawn)
 - [ ] Confidentiality (Alex)
     - [ ] AES-256, 512
         - [ ] Encryption
