@@ -3,7 +3,7 @@ from tkinter.constants import TRUE
 import hashlib
 import time
 from enum import Enum
-# from Crypto.Cipher import AES
+from Crypto.Cipher import AES
 
 # local import from "exceptions.py"
 from exceptions import IntegrityVerificationError, AuthenticationError
@@ -87,11 +87,11 @@ class Protocol:
             else:
                 self.public_val = pow(self.g,self.private_val,self.p)
                 ServerNonce = str(self.nonce)
-                return self.EncryptProtocolMessage("Client" +"," + ServerNonce + "," + str(self.public_val))
+                return self.EncryptMessage("Client" +"," + ServerNonce + "," + str(self.public_val))
         else:
             self.public_val = pow(self.g,self.private_val,self.p)
             ClientNonce, self.nonce = str(self.nonce), str(self.GetRandomChallenge())
-            return self.nonce + "," + self.EncryptProtocolMessage("Server" +"," + ClientNonce + "," + str(self.public_val))
+            return self.nonce + "," + self.EncryptMessage("Server" +"," + ClientNonce + "," + str(self.public_val))
 
 
     # Checking if a received message is part of your protocol (called from app.py)
@@ -103,10 +103,11 @@ class Protocol:
             return False
 
 
-    def EncryptProtocolMessage(self, message):
-        return message
+    def EncryptMessage(self, message, key):
+        aes = AES.new(key, AES.MODE_CBC, iv)
+        return aes.encrypt(message)
 
-    def DecryptProtocolMessage(self, message):
+    def DecryptMessage(self, message, key):
         return message
 
     # Processing protocol message
