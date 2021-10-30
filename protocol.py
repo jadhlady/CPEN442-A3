@@ -206,7 +206,7 @@ class Protocol:
     def _SetSessionKey(self, key):
         """ This function sets the session key secret (intended to be used for
         this session only."""
-        self._sessionKey = key
+        self._sessionKey = str(key)
 
 
     # Encrypting messages
@@ -220,8 +220,7 @@ class Protocol:
                 raise AuthenticationError
 
             # TODO: Use the current user's private key to protect the message before sending
-            signed_plaintext = str(plain_text)
-
+            signed_plaintext = self.EncryptMessage(plain_text, self._sessionKey)
             hash_msg = self._CalculateHash(signed_plaintext)
 
             cipher_text = signed_plaintext + hash_msg  # Append message digest for verification
@@ -251,7 +250,7 @@ class Protocol:
                 raise IntegrityVerificationError
 
             # decrypt the signed message
-            message = str(signed_message)
+            message = self.DecryptMessage(signed_message, self._sessionKey)
 
             return message
 
