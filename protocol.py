@@ -10,7 +10,6 @@ from exceptions import IntegrityVerificationError, AuthenticationError
 
 class Protocol:
     # Initializer (Called from app.py)
-    # TODO: MODIFY ARGUMENTS AND LOGIC AS YOU SEEM FIT
     def __init__(self, sharedSecret):
         # Server-mode by default until user selects a mode
         self._identifier = Protocol.ClientOrServerIdentifier.SERVER
@@ -23,7 +22,7 @@ class Protocol:
         pass
 
 
-    class ClientOrServerIdentifier(Enum):
+    class ClientOrServerIdentifier(str, Enum):
         CLIENT = "CLIENT"
         SERVER = "SERVER"
 
@@ -84,7 +83,6 @@ class Protocol:
     # Creating the initial message of your protocol (to be send to the other party to bootstrap the protocol)
     # This is only the first part of the authentication and DH process
     # Other functions will take over the next parts of the authentication and DH process
-    # TODO: IMPLEMENT THE LOGIC (MODIFY THE INPUT ARGUMENTS AS YOU SEEM FIT)
     def GetProtocolInitiationMessage(self):
         if self._identifier == Protocol.ClientOrServerIdentifier.CLIENT:
             if self.messageCount == 0:
@@ -96,16 +94,15 @@ class Protocol:
                 # Sending protocol message 3: E("Client, $ServerNonce, $public_val", _sharedSecret)
                 self.public_val = pow(self.g,self.private_val,self.p)
                 ServerNonce = str(self.nonce)
-                return self.EncryptMessage("Client" +"," + ServerNonce + "," + str(self.public_val), self._sharedSecret)
+                return self.EncryptMessage(self._identifier + "," + ServerNonce + "," + str(self.public_val), self._sharedSecret)
         else:
             # Sending protocol message 2: nonce, E("Server, $ClientNonce, $public_val", _sharedSecret)
             self.public_val = pow(self.g,self.private_val,self.p)
             ClientNonce, self.nonce = str(self.nonce), str(self.GetRandomChallenge())
-            return self.nonce + "," + self.EncryptMessage("Server" +"," + ClientNonce + "," + str(self.public_val), self._sharedSecret)
+            return self.nonce + "," + self.EncryptMessage(self._identifier + "," + ClientNonce + "," + str(self.public_val), self._sharedSecret)
 
 
     # Checking if a received message is part of your protocol (called from app.py)
-    # TODO: IMPLMENET THE LOGICs
     def IsMessagePartOfProtocol(self, message):
         if(message.find("Protocol:", 0, len("Protocol:")) != -1):
             return True  # if the message contains a protocol flag
@@ -116,22 +113,17 @@ class Protocol:
     # Default key shared secret, override with sessionKey for authenticated comms
     def EncryptMessage(self, message, key):
         AES = AESEncrypt.AESCipher(key)
-        print("encrypting:", message)
         encrypted = AES.encrypt(message)
-        print("encrypted:", encrypted)
         return encrypted
 
 
     def DecryptMessage(self, message, key):
         AES = AESEncrypt.AESCipher(key)
-        print("decrypting:", message)
         decrypted = AES.decrypt(message)
-        print("decrypted:", decrypted)
         return decrypted
 
 
     # Processing protocol message
-    # TODO: IMPLMENET THE LOGIC (CALL SetSessionKey ONCE YOU HAVE THE KEY ESTABLISHED)
     # THROW EXCEPTION IF AUTHENTICATION FAILS
     def ProcessReceivedProtocolMessage(self, message):
         if self._identifier == Protocol.ClientOrServerIdentifier.SERVER:
@@ -151,7 +143,7 @@ class Protocol:
                 # Processing protocol message 3
                 messageArray = self.DecryptMessage(message, self._sharedSecret).split(",")
                 try:
-                    if (messageArray[0] != "Client"):
+                    if (messageArray[0] != Protocol.ClientOrServerIdentifier.CLIENT):
                         raise AuthenticationError()
                     elif (self.nonce != messageArray[1]):
                         raise AuthenticationError()
@@ -174,7 +166,7 @@ class Protocol:
             encryptedMessage = message.split(',')[1]
             messageArray = self.DecryptMessage(encryptedMessage, self._sharedSecret).split(",")
             try:
-                if (messageArray[0] != "Server"):
+                if (messageArray[0] != Protocol.ClientOrServerIdentifier.SERVER):
                     raise AuthenticationError()
                 elif (self.nonce != messageArray[1]):
                     raise AuthenticationError()
@@ -195,11 +187,6 @@ class Protocol:
             self.messageCount = 1
             
             return True
-
-        # TODO: add this back somewhere
-        # # Verify we did not receive our own message
-        # if (identifier == self._identifier) or (identifier not in Protocol.ClientOrServerIdentifier.__members__):
-        #     raise AuthenticationError
     
 
     # Setting the shared secret to encrypt protocol messages
@@ -217,7 +204,6 @@ class Protocol:
 
 
     # Encrypting messages
-    # TODO: IMPLEMENT ENCRYPTION WITH THE SESSION KEY (ALSO INCLUDE ANY NECESSARY INFO IN THE ENCRYPTED MESSAGE FOR INTEGRITY PROTECTION)
     # RETURN AN ERROR MESSAGE IF INTEGRITY VERITIFCATION OR AUTHENTICATION FAILS
     def EncryptAndProtectMessage(self, plain_text):
         try:
@@ -236,7 +222,6 @@ class Protocol:
         
 
     # Decrypting and verifying messages
-    # TODO: IMPLEMENT DECRYPTION AND INTEGRITY CHECK WITH THE SESSION KEY
     # RETURN AN ERROR MESSAGE IF INTEGRITY VERITIFCATION OR AUTHENTICATION FAILS
     def DecryptAndVerifyMessage(self, cipher_text):
         try:
