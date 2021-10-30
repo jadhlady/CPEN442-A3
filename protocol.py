@@ -81,17 +81,20 @@ class Protocol:
     def GetProtocolInitiationMessage(self):
         if self._identifier == Protocol.ClientOrServerIdentifier.CLIENT:
             if self.messageCount == 0:
+                # Sending protocol message 1: "Im Client, $nonce"
                 self.public_val = pow(self.g,self.private_val,self.p)
                 self.nonce = self.GetRandomChallenge() # Set nonce to current time
                 return "Im Client," + str(self.nonce)
             else:
+                # Sending protocol message 3: E("Client, $ServerNonce, $public_val", _sharedSecret)
                 self.public_val = pow(self.g,self.private_val,self.p)
                 ServerNonce = str(self.nonce)
-                return self.EncryptMessage("Client" +"," + ServerNonce + "," + str(self.public_val))
+                return self.EncryptMessage("Client" +"," + ServerNonce + "," + str(self.public_val), self._sharedSecret)
         else:
+            # Sending protocol message 2: nonce, E("Server, $ClientNonce, $public_val", _sharedSecret)
             self.public_val = pow(self.g,self.private_val,self.p)
             ClientNonce, self.nonce = str(self.nonce), str(self.GetRandomChallenge())
-            return self.nonce + "," + self.EncryptMessage("Server" +"," + ClientNonce + "," + str(self.public_val))
+            return self.nonce + "," + self.EncryptMessage("Server" +"," + ClientNonce + "," + str(self.public_val), self._sharedSecret)
 
 
     # Checking if a received message is part of your protocol (called from app.py)
@@ -102,14 +105,23 @@ class Protocol:
         else:
             return False
 
-    # Default key shared secret, override with sessionKey for authenticated comms
-    def EncryptMessage(self, message, key=self._sharedSecret):
-        AES = AESEncrypt.AESCipher(key)
-        return AES.encrypt(message)
 
-    def DecryptMessage(self, message, key=self._sharedSecret):
+    # Default key shared secret, override with sessionKey for authenticated comms
+    def EncryptMessage(self, message, key):
         AES = AESEncrypt.AESCipher(key)
-        return AES.decrypt(message)
+        print("encrypting:", message)
+        encrypted = AES.encrypt(message)
+        print("encrypted:", encrypted)
+        return encrypted
+
+
+    def DecryptMessage(self, message, key):
+        AES = AESEncrypt.AESCipher(key)
+        print("decrypting:", message)
+        decrypted = AES.decrypt(message)
+        print("decrypted:", decrypted)
+        return decrypted
+
 
     # Processing protocol message
     # TODO: IMPLMENET THE LOGIC (CALL SetSessionKey ONCE YOU HAVE THE KEY ESTABLISHED)
@@ -117,6 +129,7 @@ class Protocol:
     def ProcessReceivedProtocolMessage(self, message):
         if self._identifier == Protocol.ClientOrServerIdentifier.SERVER:
             if self.messageCount == 0:
+                # Processing protocol message 1
                 try:
                     messageArray = message.split(",")
                     if (messageArray[0] != "Im Client"):
@@ -128,7 +141,8 @@ class Protocol:
 
                 return True
             else:
-                messageArray = self.DecryptProtocolMessage(message).split(",")
+                # Processing protocol message 3
+                messageArray = self.DecryptMessage(message, self._sharedSecret).split(",")
                 try:
                     if (messageArray[0] != "Client"):
                         raise AuthenticationError()
@@ -148,8 +162,10 @@ class Protocol:
                 # Protocol is finished, do not respond
                 return False
         else:
-            nonceNew = message[:message.find(",")]
-            messageArray = self.DecryptProtocolMessage(message)[message.find(",")+1:].split(",")
+            # Processing message 2: nonce, E("Server, $ClientNonce, $public_val", _sharedSecret)
+            nonceNew = message.split(',')[0]
+            encryptedMessage = message.split(',')[1]
+            messageArray = self.DecryptMessage(encryptedMessage, self._sharedSecret).split(",")
             try:
                 if (messageArray[0] != "Server"):
                     raise AuthenticationError()
@@ -165,6 +181,9 @@ class Protocol:
 
             # Client calculates session key
             self._SetSessionKey(pow(self.ServerDHKey, self.private_val, self.p))
+
+            # Store nonce to encrypt it later
+            self.nonce = nonceNew
 
             self.messageCount = 1
             

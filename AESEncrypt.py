@@ -13,9 +13,11 @@ class AESCipher(object):
         raw = self._pad(raw)
         iv = Random.new().read(AES.block_size)
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        return base64.b64encode(iv + cipher.encrypt(raw.encode()))
+        # takes in bytes, returns bytes
+        return str(base64.b64encode(iv + cipher.encrypt(raw.encode())), 'utf-8')
 
     def decrypt(self, enc):
+        enc = bytes(enc.encode())
         enc = base64.b64decode(enc)
         iv = enc[:AES.block_size]
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
@@ -27,21 +29,3 @@ class AESCipher(object):
     @staticmethod
     def _unpad(s):
         return s[:-ord(s[len(s)-1:])]
-
-
-
-
-
-
-string = "Hello World"
-key = "asdfghjkloqiwueys"
-Enc = AESCipher(key)
-
-ciphertext = Enc.encrypt(string)
-
-cleartext = Enc.decrypt(b'mnLmmpkKL3VIE4LfYRmHAnBVzWNzrhfTVRnRe3PyffY=')
-
-print(string, ciphertext, cleartext)
-
-# Gotten from stack overflow
-# https://stackoverflow.com/questions/12524994/encrypt-decrypt-using-pycrypto-aes-256
