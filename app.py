@@ -56,7 +56,7 @@ class Assignment3VPN:
         # Bind secretEntry value
         self.secretEntry.bind("<KeyRelease>", self._OnSharedSecretChanged)
      
-    # Distructor     
+    # Destructor     
     def __del__(self):
         # Closing the network socket
         if self.s is not None:
@@ -150,7 +150,7 @@ class Assignment3VPN:
         while True:
             try:
                 # Receiving all the data
-                cipher_text = self.conn.recv(4096)
+                cipher_text = self.conn.recv(4096).decode('utf-8') #I think this is where the error is
 
                 # Check if socket is still open
                 if cipher_text == None or len(cipher_text) == 0:
@@ -160,12 +160,15 @@ class Assignment3VPN:
                 # Checking if the received message is part of your protocol
                 # TODO: MODIFY THE INPUT ARGUMENTS AND LOGIC IF NECESSARY
                 if self.prtcl.IsMessagePartOfProtocol(cipher_text):
+                    cipher_text = cipher_text.removeprefix("Protocol:")
                     # Disabling the button to prevent repeated clicks
                     self.secureButton["state"] = "disabled"
                     # Processing the protocol message
-                    self.prtcl.ProcessReceivedProtocolMessage(cipher_text)
+                    shouldClientSendThirdProtocolMessage = self.prtcl.ProcessReceivedProtocolMessage(cipher_text)
+                    if shouldClientSendThirdProtocolMessage == True:
+                        self._SendProtocolMessage(self.prtcl.GetProtocolInitiationMessage())
 
-                # Otherwise, decrypting and showing the messaage
+                # Otherwise, decrypting and showing the message
                 else:
                     plain_text = self.prtcl.DecryptAndVerifyMessage(cipher_text)
                     self._AppendMessage("Other: {}".format(plain_text))
@@ -175,11 +178,17 @@ class Assignment3VPN:
                 return False
 
 
+    # Send Protocol data to the other party
+    def _SendProtocolMessage(self, message):
+        plain_text = "Protocol:" + message
+        self._AppendLog("SENDING PROTOCOL MESSAGE: " + str(type(message)))
+        self.conn.send(plain_text.encode('utf-8'))
+
     # Send data to the other party
     def _SendMessage(self, message):
         plain_text = message
         cipher_text = self.prtcl.EncryptAndProtectMessage(plain_text)
-        self.conn.send(cipher_text.encode())
+        self.conn.send(cipher_text.encode('utf-8'))
             
 
     # Secure connection with mutual authentication and key establishment
@@ -189,7 +198,7 @@ class Assignment3VPN:
 
         # TODO: THIS IS WHERE YOU SHOULD IMPLEMENT THE START OF YOUR MUTUAL AUTHENTICATION AND KEY ESTABLISHMENT PROTOCOL, MODIFY AS YOU SEEM FIT
         init_message = self.prtcl.GetProtocolInitiationMessage()
-        self._SendMessage(init_message)
+        self._SendProtocolMessage(init_message)
 
 
     # Called when SendMessage button is clicked
