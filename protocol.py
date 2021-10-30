@@ -1,5 +1,5 @@
-import random
-from tkinter.constants import TRUE
+from random import random
+from Crypto.Random import random
 import hashlib
 import time
 from enum import Enum
