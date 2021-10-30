@@ -36,21 +36,28 @@ class Protocol:
         return hashlib.sha256(msg_bytes).hexdigest()
 
 
-    def _VerifyIntegrity(self, hash_message):
+    def _VerifyIntegrity(self, received_hash, message):
         """ This cryptogrpahic hash function is implemented using the SHA-256 algorithm.
         It is used to check the integrity of the messages. """
 
-        # Extract the hash value from string
-        hash_value = hash_message[-64:]
-        orig_len = len(hash_message)
-        message = hash_message[:orig_len - 64]
+        calculated_hash = self._CalculateHash(str(message))
 
-        received_hash = self._CalculateHash(str(message))
+        if (received_hash != calculated_hash):
+            return False
 
-        if (received_hash != hash_value):
-            return [False, message]
+        return True
 
-        return [True, message]
+
+    def _ExtractHash(self, message_with_hash):
+        """ This function extracts the hashed plaintext value out of the last 64 characters of
+        the message, which will be used to verify the integrity of the message."""
+        return message_with_hash[-64:]
+
+
+    def _RemoveHash(self, message_with_hash):
+        """ This function removes the hash value from the message."""
+        orig_len = len(message_with_hash)
+        return message_with_hash[:orig_len - 64]
 
 
     def _AuthenticateSender(self):
@@ -219,11 +226,9 @@ class Protocol:
             if (not authenticated):
                 raise AuthenticationError
 
-            # TODO: Use the current user's private key to protect the message before sending
-            signed_plaintext = self.EncryptMessage(plain_text, self._sessionKey)
-            hash_msg = self._CalculateHash(signed_plaintext)
+            hash_msg = self._CalculateHash(plain_text) # Append message digest for verification
+            cipher_text = self.EncryptMessage(plain_text + hash_msg, self._sessionKey)
 
-            cipher_text = signed_plaintext + hash_msg  # Append message digest for verification
             return cipher_text
 
         except AuthenticationError as error:
@@ -239,18 +244,16 @@ class Protocol:
 
             if (not authenticated):
                 raise AuthenticationError
-            
-            # TODO: Remove the signature layer here to get the message appended with its hash value
-            # before verifying the hash and message
-            hash_msg = str(cipher_text)
 
-            integrity_verified, signed_message = self._VerifyIntegrity(hash_msg)
+            message_with_hash = self.DecryptMessage(cipher_text, self._sessionKey)
+            
+            received_hash = self._ExtractHash(message_with_hash)
+            message = self._RemoveHash(message_with_hash)
+
+            integrity_verified = self._VerifyIntegrity(received_hash, message)
 
             if (not integrity_verified):
                 raise IntegrityVerificationError
-
-            # decrypt the signed message
-            message = self.DecryptMessage(signed_message, self._sessionKey)
 
             return message
 
