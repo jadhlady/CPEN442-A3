@@ -96,10 +96,14 @@ class Protocol:
                 ServerNonce = str(self.nonce)
                 return self.EncryptMessage(self._identifier + "," + ServerNonce + "," + str(self.public_val), self._sharedSecret)
         else:
-            # Sending protocol message 2: nonce, E("Server, $ClientNonce, $public_val", _sharedSecret)
-            self.public_val = pow(self.g,self.private_val,self.p)
-            ClientNonce, self.nonce = str(self.nonce), str(self.GetRandomChallenge())
-            return self.nonce + "," + self.EncryptMessage(self._identifier + "," + ClientNonce + "," + str(self.public_val), self._sharedSecret)
+            if self.messageCount == 0:
+                # Tell client to start protocol
+                return "Im Server"
+            else:
+                # Sending protocol message 2: nonce, E("Server, $ClientNonce, $public_val", _sharedSecret)
+                self.public_val = pow(self.g,self.private_val,self.p)
+                ClientNonce, self.nonce = str(self.nonce), str(self.GetRandomChallenge())
+                return self.nonce + "," + self.EncryptMessage(self._identifier + "," + ClientNonce + "," + str(self.public_val), self._sharedSecret)
 
 
     # Checking if a received message is part of your protocol (called from app.py)
@@ -161,6 +165,10 @@ class Protocol:
                 # Protocol is finished, do not respond
                 return False
         else:
+            if message == "Im Server":
+                # Start protocol
+                return True
+
             # Processing message 2: nonce, E("Server, $ClientNonce, $public_val", _sharedSecret)
             nonceNew = message.split(',')[0]
             encryptedMessage = message.split(',')[1]
