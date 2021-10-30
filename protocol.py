@@ -41,9 +41,9 @@ class Protocol:
         It is used to check the integrity of the messages. """
 
         # Extract the hash value from string
-        hash_value = hash_message[-65:-1]
+        hash_value = hash_message[-64:]
         orig_len = len(hash_message)
-        message = hash_message[2:orig_len - 65]
+        message = hash_message[:orig_len - 64]
 
         received_hash = self._CalculateHash(str(message))
 
@@ -81,17 +81,14 @@ class Protocol:
     def GetProtocolInitiationMessage(self):
         if self._identifier == Protocol.ClientOrServerIdentifier.CLIENT:
             if self.messageCount == 0:
-                print("CLIENT: Send first protocol message")
                 self.public_val = pow(self.g,self.private_val,self.p)
                 self.nonce = self.GetRandomChallenge() # Set nonce to current time
                 return "Im Client," + str(self.nonce)
             else:
-                print("CLIENT: Send third protocol message")
                 self.public_val = pow(self.g,self.private_val,self.p)
                 ServerNonce = str(self.nonce)
                 return self.EncryptProtocolMessage("Client" +"," + ServerNonce + "," + str(self.public_val))
         else:
-            print("SERVER: Send second protocol message")
             self.public_val = pow(self.g,self.private_val,self.p)
             ClientNonce, self.nonce = str(self.nonce), str(self.GetRandomChallenge())
             return self.nonce + "," + self.EncryptProtocolMessage("Server" +"," + ClientNonce + "," + str(self.public_val))
@@ -118,7 +115,6 @@ class Protocol:
     def ProcessReceivedProtocolMessage(self, message):
         if self._identifier == Protocol.ClientOrServerIdentifier.SERVER:
             if self.messageCount == 0:
-                print("Server receives first protocol message")
                 try:
                     messageArray = message.split(",")
                     if (messageArray[0] != "Im Client"):
@@ -130,7 +126,6 @@ class Protocol:
 
                 return True
             else:
-                print("Server receives third protocol message")
                 messageArray = self.DecryptProtocolMessage(message).split(",")
                 try:
                     if (messageArray[0] != "Client"):
@@ -151,9 +146,8 @@ class Protocol:
                 # Protocol is finished, do not respond
                 return False
         else:
-            print("Client receives second protocol message")
             nonceNew = message[:message.find(",")]
-            messageArray = self.DecryptProtocolMessage(message).split(",")
+            messageArray = self.DecryptProtocolMessage(message)[message.find(",")+1:].split(",")
             try:
                 if (messageArray[0] != "Server"):
                     raise AuthenticationError()
@@ -161,7 +155,7 @@ class Protocol:
                     raise AuthenticationError()
 
                 try:
-                    self.ServerDHKey = messageArray[2]
+                    self.ServerDHKey = int(messageArray[2])
                 except ValueError:
                     raise AuthenticationError
             except AuthenticationError:
