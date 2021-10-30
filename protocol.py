@@ -80,7 +80,7 @@ class Protocol:
     # TODO: IMPLEMENT THE LOGIC (MODIFY THE INPUT ARGUMENTS AS YOU SEEM FIT)
     def GetProtocolInitiationMessage(self):
         if self._identifier == Protocol.ClientOrServerIdentifier.CLIENT:
-            if not self.messageCount:
+            if self.messageCount == 0:
                 print("CLIENT: Send first protocol message")
                 self.public_val = pow(self.g,self.private_val,self.p)
                 self.nonce = self.GetRandomChallenge() # Set nonce to current time
@@ -127,6 +127,8 @@ class Protocol:
                     self.messageCount = 1
                 except AuthenticationError:
                     return "AUTHENTICATION ERROR: FAILED TO ESTABLISH CONNECTION"
+
+                return True
             else:
                 print("Server receives third protocol message")
                 messageArray = self.DecryptProtocolMessage(message).split(",")
@@ -145,7 +147,9 @@ class Protocol:
 
                 # Server calculates session key
                 self._SetSessionKey(pow(self.ClientDHKey, self.private_val, self.p))
-        
+
+                # Protocol is finished, do not respond
+                return False
         else:
             print("Client receives second protocol message")
             nonceNew = message[:message.find(",")]

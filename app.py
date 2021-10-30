@@ -159,13 +159,17 @@ class Assignment3VPN:
 
                 # Checking if the received message is part of your protocol
                 # TODO: MODIFY THE INPUT ARGUMENTS AND LOGIC IF NECESSARY
+                self._AppendLog("RECEIVED MESSAGE: " + cipher_text)
                 if self.prtcl.IsMessagePartOfProtocol(cipher_text):
-                    cipher_text = cipher_text.removeprefix("Protocol:")
+                    self._AppendLog("MESSAGE IS PROTOCOL")
                     # Disabling the button to prevent repeated clicks
                     self.secureButton["state"] = "disabled"
+
+                    cipher_text = cipher_text.removeprefix("Protocol:")
                     # Processing the protocol message
-                    shouldClientSendThirdProtocolMessage = self.prtcl.ProcessReceivedProtocolMessage(cipher_text)
-                    if shouldClientSendThirdProtocolMessage == True:
+                    shouldRespondProtocolMessage = self.prtcl.ProcessReceivedProtocolMessage(cipher_text)
+                    if shouldRespondProtocolMessage == True:
+                        self._AppendLog("RESPONDING")
                         self._SendProtocolMessage(self.prtcl.GetProtocolInitiationMessage())
 
                 # Otherwise, decrypting and showing the message
@@ -181,7 +185,7 @@ class Assignment3VPN:
     # Send Protocol data to the other party
     def _SendProtocolMessage(self, message):
         plain_text = "Protocol:" + message
-        self._AppendLog("SENDING PROTOCOL MESSAGE: " + str(type(message)))
+        self._AppendLog("SENDING PROTOCOL MESSAGE: " + message)
         self.conn.send(plain_text.encode('utf-8'))
 
     # Send data to the other party
