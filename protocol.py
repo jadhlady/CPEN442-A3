@@ -89,12 +89,12 @@ class Protocol:
                 print("CLIENT: Send third protocol message")
                 self.public_val = pow(self.g,self.private_val,self.p)
                 ServerNonce = str(self.nonce)
-                return self.EncryptProtocolMessage("Client" +"," + ServerNonce + "," + self.public_val)
+                return self.EncryptProtocolMessage("Client" +"," + ServerNonce + "," + str(self.public_val))
         else:
             print("SERVER: Send second protocol message")
             self.public_val = pow(self.g,self.private_val,self.p)
             ClientNonce, self.nonce = str(self.nonce), str(self.GetRandomChallenge())
-            return self.nonce + "," + self.EncryptProtocolMessage("Server" +"," + ClientNonce + "," + self.public_val)
+            return self.nonce + "," + self.EncryptProtocolMessage("Server" +"," + ClientNonce + "," + str(self.public_val))
 
 
     # Checking if a received message is part of your protocol (called from app.py)
@@ -135,7 +135,11 @@ class Protocol:
                         raise AuthenticationError()
                     elif (self.nonce != messageArray[1]):
                         raise AuthenticationError()
-                    self.ClientDHKey = messageArray[2]
+                    
+                    try:
+                        self.ClientDHKey = int(messageArray[2])
+                    except ValueError:
+                        raise AuthenticationError
                 except AuthenticationError:
                     return "AUTHENTICATION ERROR: FAILED TO ESTABLISH CONNECTION"
 
@@ -151,7 +155,11 @@ class Protocol:
                     raise AuthenticationError()
                 elif (self.nonce != messageArray[1]):
                     raise AuthenticationError()
-                self.ServerDHKey = messageArray[2]
+
+                try:
+                    self.ServerDHKey = messageArray[2]
+                except ValueError:
+                    raise AuthenticationError
             except AuthenticationError:
                 return "AUTHENTICATION ERROR: FAILED TO ESTABLISH CONNECTION"
 
