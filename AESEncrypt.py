@@ -1,22 +1,25 @@
 import base64
-from Crypto.Cipher import AES
+import hashlib
 from Crypto import Random
+from Crypto.Cipher import AES
 
-class AESCipher:
-    def __init__( self, key ):
-        self.key = key
+class AESCipher(object):
 
-    def encrypt( self, raw ):
-        raw = pad(raw)
-        iv = Random.new().read( AES.block_size )
-        cipher = AES.new( self.key, AES.MODE_CBC, iv )
-        return base64.b64encode( iv + cipher.encrypt( raw ) ) 
+    def __init__(self, key): 
+        self.bs = AES.block_size
+        self.key = hashlib.sha256(key.encode()).digest()
 
-    def decrypt( self, enc ):
+    def encrypt(self, raw):
+        raw = self._pad(raw)
+        iv = Random.new().read(AES.block_size)
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        return base64.b64encode(iv + cipher.encrypt(raw.encode()))
+
+    def decrypt(self, enc):
         enc = base64.b64decode(enc)
-        iv = enc[:16]
-        cipher = AES.new(self.key, AES.MODE_CBC, iv )
-        return unpad(cipher.decrypt( enc[16:] ))
+        iv = enc[:AES.block_size]
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        return self._unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
 
     def _pad(self, s):
         return s + (self.bs - len(s) % self.bs) * chr(self.bs - len(s) % self.bs)
@@ -36,7 +39,7 @@ Enc = AESCipher(key)
 
 ciphertext = Enc.encrypt(string)
 
-cleartext = Enc.decrypt(ciphertext)
+cleartext = Enc.decrypt(b'mnLmmpkKL3VIE4LfYRmHAnBVzWNzrhfTVRnRe3PyffY=')
 
 print(string, ciphertext, cleartext)
 

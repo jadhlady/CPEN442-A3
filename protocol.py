@@ -3,7 +3,7 @@ from tkinter.constants import TRUE
 import hashlib
 import time
 from enum import Enum
-from Crypto.Cipher import AES
+import AESEncrypt
 
 # local import from "exceptions.py"
 from exceptions import IntegrityVerificationError, AuthenticationError
@@ -102,13 +102,14 @@ class Protocol:
         else:
             return False
 
+    # Default key shared secret, override with sessionKey for authenticated comms
+    def EncryptMessage(self, message, key=self._sharedSecret):
+        AES = AESEncrypt.AESCipher(key)
+        return AES.encrypt(message)
 
-    def EncryptMessage(self, message, key):
-        aes = AES.new(key, AES.MODE_CBC, iv)
-        return aes.encrypt(message)
-
-    def DecryptMessage(self, message, key):
-        return message
+    def DecryptMessage(self, message, key=self._sharedSecret):
+        AES = AESEncrypt.AESCipher(key)
+        return AES.decrypt(message)
 
     # Processing protocol message
     # TODO: IMPLMENET THE LOGIC (CALL SetSessionKey ONCE YOU HAVE THE KEY ESTABLISHED)
